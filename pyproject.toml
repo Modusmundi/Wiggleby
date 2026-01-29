@@ -1,0 +1,20 @@
+[project]
+name = "wiggleby"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.pyrefly]
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
+]
+
+[dependency-groups]
+dev = [
+    "anyio>=4.12.1",
+    "pyrefly>=0.50.1",
+    "pytest>=9.0.2",
+]
