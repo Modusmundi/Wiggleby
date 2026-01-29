@@ -29,6 +29,8 @@ CAT_COLORS = {
     "dark_orange": _color(202),
     "light_gray": _color(249),
     "dark_gray": _color(239),
+    "golden": _color(178),
+    "auburn": _color(124),
 }
 
 # Pattern type alias
@@ -234,14 +236,194 @@ def print_catto() -> None:
     print(colored_content)
 
 
+def _iggy_pattern() -> PatternFunc:
+    """Create Iggy's specific tuxedo pattern - black cap/back, white face/chest."""
+    def apply(content: str) -> str:
+        lines = content.split("\n")
+        total_lines = len(lines)
+        result = []
+
+        for i, line in enumerate(lines):
+            if not line.strip():
+                result.append(line)
+                continue
+
+            line_len = len(line)
+            # Find the center of the actual content (not leading spaces)
+            stripped = line.lstrip()
+            leading_spaces = len(line) - len(stripped)
+            content_len = len(stripped)
+            center = leading_spaces + content_len // 2
+
+            colored_line = ""
+            for j, char in enumerate(line):
+                if char in " \t":
+                    colored_line += char
+                    continue
+
+                # Calculate relative position from center
+                dist_from_center = abs(j - center)
+                relative_line = i / total_lines
+
+                # Determine if this position should be black or white
+                is_black = False
+
+                # Very top of head / ear tips (lines 0-6): all black
+                if relative_line < 0.08:
+                    is_black = True
+
+                # Upper head with white blaze starting (lines 7-11)
+                # White blaze in center, black on sides
+                elif relative_line < 0.14:
+                    # Narrow white blaze in center, widens as we go down
+                    blaze_width = 0.08 + (relative_line - 0.08) * 0.5
+                    if dist_from_center > content_len * blaze_width:
+                        is_black = True
+
+                # Upper face (lines 12-18): white blaze widens
+                elif relative_line < 0.22:
+                    blaze_width = 0.12 + (relative_line - 0.14) * 0.8
+                    if dist_from_center > content_len * blaze_width:
+                        is_black = True
+
+                # Face area (lines 18-28): white center, black edges
+                elif relative_line < 0.34:
+                    if dist_from_center > content_len * 0.35:
+                        is_black = True
+
+                # Upper body (lines 28-45): black back, white chest
+                elif relative_line < 0.54:
+                    if dist_from_center > content_len * 0.25:
+                        is_black = True
+
+                # Mid body (lines 45-60): wider white chest area
+                elif relative_line < 0.72:
+                    if dist_from_center > content_len * 0.3:
+                        is_black = True
+
+                # Lower body/legs (lines 60-75): white paws, some black
+                elif relative_line < 0.90:
+                    if dist_from_center > content_len * 0.4:
+                        is_black = True
+
+                # Feet (lines 75+): mostly white paws
+                else:
+                    if dist_from_center > content_len * 0.45:
+                        is_black = True
+
+                if is_black:
+                    colored_line += f"{CAT_COLORS['black']}{char}{RESET}"
+                else:
+                    colored_line += f"{CAT_COLORS['white']}{char}{RESET}"
+
+            result.append(colored_line)
+
+        return "\n".join(result)
+    return apply
+
+
 def for_iggy() -> None:
-    """Print a black and white bicolor cat for Iggy."""
+    """Print a black and white tuxedo cat matching Iggy's markings."""
     catto_path = Path(__file__).parent / "catto"
     content = catto_path.read_text(encoding="utf-8")
-    pattern_func = _bicolor_pattern("black", "white")
+    pattern_func = _iggy_pattern()
     colored_content = pattern_func(content)
     print(colored_content)
     print("I miss the potamus.")
+
+
+def _lucy_pattern() -> PatternFunc:
+    """Create Lucy's warm brown-to-golden gradient pattern."""
+    def apply(content: str) -> str:
+        lines = content.split("\n")
+        total_lines = len(lines)
+        result = []
+
+        for i, line in enumerate(lines):
+            if not line.strip():
+                result.append(line)
+                continue
+
+            line_len = len(line)
+            stripped = line.lstrip()
+            leading_spaces = len(line) - len(stripped)
+            content_len = len(stripped)
+            center = leading_spaces + content_len // 2
+
+            colored_line = ""
+            for j, char in enumerate(line):
+                if char in " \t":
+                    colored_line += char
+                    continue
+
+                dist_from_center = abs(j - center)
+                relative_line = i / total_lines
+
+                # Determine color based on position
+                # Dark brown on edges and top, golden-orange in center
+                if relative_line < 0.15:
+                    # Top of head - darker brown tones
+                    if dist_from_center > content_len * 0.3:
+                        color = "chocolate"
+                    else:
+                        color = "brown"
+                elif relative_line < 0.35:
+                    # Face area - brown with some orange
+                    if dist_from_center > content_len * 0.35:
+                        color = "chocolate"
+                    elif dist_from_center > content_len * 0.2:
+                        color = "brown"
+                    else:
+                        color = "ginger"
+                elif relative_line < 0.65:
+                    # Chest/body - golden center, brown edges
+                    if dist_from_center > content_len * 0.35:
+                        color = "brown"
+                    elif dist_from_center > content_len * 0.2:
+                        color = "ginger"
+                    else:
+                        color = "golden"
+                elif relative_line < 0.85:
+                    # Lower body - orange/golden belly
+                    if dist_from_center > content_len * 0.4:
+                        color = "brown"
+                    elif dist_from_center > content_len * 0.25:
+                        color = "orange"
+                    else:
+                        color = "golden"
+                else:
+                    # Legs/paws - brown with ginger
+                    if dist_from_center > content_len * 0.35:
+                        color = "brown"
+                    else:
+                        color = "ginger"
+
+                colored_line += f"{CAT_COLORS[color]}{char}{RESET}"
+
+            result.append(colored_line)
+
+        return "\n".join(result)
+    return apply
+
+
+def for_lucy() -> None:
+    """Print a warm brown and golden cat for Lucy."""
+    catto_path = Path(__file__).parent / "catto"
+    content = catto_path.read_text(encoding="utf-8")
+    pattern_func = _lucy_pattern()
+    colored_content = pattern_func(content)
+    print(colored_content)
+    print("The world's babiest.")
+
+
+def for_moo() -> None:
+    """Print a black cat for Magda (the moominkittycat)."""
+    catto_path = Path(__file__).parent / "catto"
+    content = catto_path.read_text(encoding="utf-8")
+    pattern_func = _solid_pattern("black")
+    colored_content = pattern_func(content)
+    print(colored_content)
+    print("The moominkittycat would like food.  Please.")
 
 
 CAT_NAMES = ["iggy", "magda", "lucy", "cassandra", "persephone"]
@@ -274,12 +456,12 @@ def parse_args() -> argparse.Namespace:
     cat_group.add_argument(
         "--lucy",
         action="store_true",
-        help="Select Lucy (currently does nothing)",
+        help="Display a brown tabby cat for Lucy",
     )
     cat_group.add_argument(
         "--magda",
         action="store_true",
-        help="Select Magda (currently does nothing)",
+        help="Display a black cat for Magda the moominkittycat",
     )
     cat_group.add_argument(
         "--cassandra",
@@ -299,6 +481,10 @@ def main() -> None:
     args = parse_args()
     if args.iggy:
         for_iggy()
+    elif args.lucy:
+        for_lucy()
+    elif args.magda:
+        for_moo()
     else:
         print_catto()
 
