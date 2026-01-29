@@ -23,8 +23,8 @@ uv run python main.py --iggy
 | `--iggy` | Display a black and white tuxedo cat for Iggy |
 | `--lucy` | Display a warm brown and golden cat for Lucy |
 | `--magda` | Display a solid black cat for Magda the moominkittycat |
-| `--cassandra` | Reserved for future use |
-| `--persephone` | Reserved for future use |
+| `--cassandra` | Display a silver cat for Cassandra |
+| `--persephone` | Display a silver cat for Persephone |
 | `--help` | Show help message and available options |
 
 Note: Cat flags are mutually exclusive - only one can be used at a time.

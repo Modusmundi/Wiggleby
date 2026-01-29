@@ -426,6 +426,24 @@ def for_moo() -> None:
     print("The moominkittycat would like food.  Please.")
 
 
+def for_cassandra() -> None:
+    """Print a silver cat for Cassandra."""
+    catto_path = Path(__file__).parent / "catto"
+    content = catto_path.read_text(encoding="utf-8")
+    pattern_func = _solid_pattern("silver")
+    colored_content = pattern_func(content)
+    print(colored_content)
+
+
+def for_persephone() -> None:
+    """Print a silver cat for Persephone."""
+    catto_path = Path(__file__).parent / "catto"
+    content = catto_path.read_text(encoding="utf-8")
+    pattern_func = _solid_pattern("silver")
+    colored_content = pattern_func(content)
+    print(colored_content)
+
+
 CAT_NAMES = ["iggy", "magda", "lucy", "cassandra", "persephone"]
 
 
@@ -466,12 +484,12 @@ def parse_args() -> argparse.Namespace:
     cat_group.add_argument(
         "--cassandra",
         action="store_true",
-        help="Select Cassandra (currently does nothing)",
+        help="Display a silver cat for Cassandra",
     )
     cat_group.add_argument(
         "--persephone",
         action="store_true",
-        help="Select Persephone (currently does nothing)",
+        help="Display a silver cat for Persephone",
     )
 
     return parser.parse_args()
@@ -485,6 +503,10 @@ def main() -> None:
         for_lucy()
     elif args.magda:
         for_moo()
+    elif args.cassandra:
+        for_cassandra()
+    elif args.persephone:
+        for_persephone()
     else:
         print_catto()
 
