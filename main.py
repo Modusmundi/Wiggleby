@@ -1,5 +1,6 @@
 import argparse
 import random
+import sys
 from pathlib import Path
 from typing import Callable, NoReturn
 
@@ -645,6 +646,9 @@ class CatArgumentParser(argparse.ArgumentParser):
                 "You cannot call multiple cats!  "
                 "You must pick between iggy, magda, lucy, cassandra, or persephone.\n",
             )
+        if "unrecognized arguments" in message:
+            self.print_help(sys.stderr)
+            self.exit(2, f"\nError: {message}\n")
         super().error(message)
 
 
@@ -671,12 +675,12 @@ def parse_args() -> argparse.Namespace:
     cat_group.add_argument(
         "--cassandra",
         action="store_true",
-        help="Display a silver cat for Cassandra",
+        help="Display a silver tabby cat for Cassandra",
     )
     cat_group.add_argument(
         "--persephone",
         action="store_true",
-        help="Display a silver cat for Persephone",
+        help="Display a silver and white bicolor cat for Persephone",
     )
 
     return parser.parse_args()
