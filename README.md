@@ -4,7 +4,7 @@ A command-line tool that displays ASCII art cats in various color patterns.
 
 ## Overview
 
-Wiggleby prints a colorful ASCII cat to your terminal. By default, it randomly selects from 29 realistic cat color patterns including solid colors, bicolor, tabby, calico, tortoiseshell, tuxedo, colorpoint, and smoke patterns.
+Wiggleby prints a colorful ASCII cat to your terminal. By default, it randomly selects from 37 realistic cat color patterns including solid colors, bicolor, tuxedo-style bicolor, tabby, calico, tortoiseshell, tuxedo, colorpoint, and smoke patterns.
 
 ## Usage
 
@@ -23,8 +23,8 @@ uv run python main.py --iggy
 | `--iggy` | Display a black and white tuxedo cat for Iggy |
 | `--lucy` | Display a warm brown and golden cat for Lucy |
 | `--magda` | Display a solid black cat for Magda the moominkittycat |
-| `--cassandra` | Display a silver cat for Cassandra |
-| `--persephone` | Display a silver cat for Persephone |
+| `--cassandra` | Display a silver tabby cat for Cassandra |
+| `--persephone` | Display a silver and white bicolor cat for Persephone |
 | `--help` | Show help message and available options |
 
 Note: Cat flags are mutually exclusive - only one can be used at a time.

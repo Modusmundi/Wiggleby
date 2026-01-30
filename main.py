@@ -202,9 +202,17 @@ def get_random_pattern() -> tuple[str, PatternFunc]:
         ("solid_fawn", _solid_pattern("fawn")),
         # Bicolor patterns
         ("bicolor_black_white", _bicolor_pattern("black", "white")),
+        ("bicolor_black_white_tuxedo", _iggy_pattern("black", "white")),
+        ("bicolor_black_white_tuxedo_invert", _iggy_pattern("white", "black")),
         ("bicolor_orange_white", _bicolor_pattern("orange", "white")),
+        ("bicolor_orange_white_tuxedo", _iggy_pattern("orange", "white")),
+        ("bicolor_orange_white_tuxedo_invert", _iggy_pattern("white", "orange")),
         ("bicolor_gray_white", _bicolor_pattern("gray", "white")),
+        ("bicolor_gray_white_tuxedo", _iggy_pattern("gray", "white")),
+        ("bicolor_gray_white_tuxedo_invert", _iggy_pattern("white", "gray")),
         ("bicolor_brown_white", _bicolor_pattern("brown", "white")),
+        ("bicolor_brown_white_tuxedo", _iggy_pattern("brown", "white")),
+        ("bicolor_brown_white_tuxedo_invert", _iggy_pattern("white", "brown")),
         # Tabby patterns
         ("tabby_brown", _tabby_pattern("brown", "chocolate")),
         ("tabby_orange", _tabby_pattern("orange", "ginger")),
@@ -236,8 +244,8 @@ def print_catto() -> None:
     print(colored_content)
 
 
-def _iggy_pattern() -> PatternFunc:
-    """Create Iggy's specific tuxedo pattern - black cap/back, white face/chest."""
+def _iggy_pattern(color1: str, color2: str) -> PatternFunc:
+    """Create a tuxedo-style bicolor pattern - color1 cap/back, color2 face/chest."""
     def apply(content: str) -> str:
         lines = content.split("\n")
         total_lines = len(lines)
@@ -248,7 +256,6 @@ def _iggy_pattern() -> PatternFunc:
                 result.append(line)
                 continue
 
-            line_len = len(line)
             # Find the center of the actual content (not leading spaces)
             stripped = line.lstrip()
             leading_spaces = len(line) - len(stripped)
@@ -265,56 +272,56 @@ def _iggy_pattern() -> PatternFunc:
                 dist_from_center = abs(j - center)
                 relative_line = i / total_lines
 
-                # Determine if this position should be black or white
-                is_black = False
+                # Determine if this position should be color1 (back) or color2 (chest)
+                is_back_color = False
 
-                # Very top of head / ear tips (lines 0-6): all black
+                # Very top of head / ear tips (lines 0-6): all color1
                 if relative_line < 0.08:
-                    is_black = True
+                    is_back_color = True
 
-                # Upper head with white blaze starting (lines 7-11)
-                # White blaze in center, black on sides
+                # Upper head with blaze starting (lines 7-11)
+                # Blaze in center (color2), color1 on sides
                 elif relative_line < 0.14:
-                    # Narrow white blaze in center, widens as we go down
+                    # Narrow blaze in center, widens as we go down
                     blaze_width = 0.08 + (relative_line - 0.08) * 0.5
                     if dist_from_center > content_len * blaze_width:
-                        is_black = True
+                        is_back_color = True
 
-                # Upper face (lines 12-18): white blaze widens
+                # Upper face (lines 12-18): blaze widens
                 elif relative_line < 0.22:
                     blaze_width = 0.12 + (relative_line - 0.14) * 0.8
                     if dist_from_center > content_len * blaze_width:
-                        is_black = True
+                        is_back_color = True
 
-                # Face area (lines 18-28): white center, black edges
+                # Face area (lines 18-28): color2 center, color1 edges
                 elif relative_line < 0.34:
                     if dist_from_center > content_len * 0.35:
-                        is_black = True
+                        is_back_color = True
 
-                # Upper body (lines 28-45): black back, white chest
+                # Upper body (lines 28-45): color1 back, color2 chest
                 elif relative_line < 0.54:
                     if dist_from_center > content_len * 0.25:
-                        is_black = True
+                        is_back_color = True
 
-                # Mid body (lines 45-60): wider white chest area
+                # Mid body (lines 45-60): wider color2 chest area
                 elif relative_line < 0.72:
                     if dist_from_center > content_len * 0.3:
-                        is_black = True
+                        is_back_color = True
 
-                # Lower body/legs (lines 60-75): white paws, some black
+                # Lower body/legs (lines 60-75): color2 paws, some color1
                 elif relative_line < 0.90:
                     if dist_from_center > content_len * 0.4:
-                        is_black = True
+                        is_back_color = True
 
-                # Feet (lines 75+): mostly white paws
+                # Feet (lines 75+): mostly color2 paws
                 else:
                     if dist_from_center > content_len * 0.45:
-                        is_black = True
+                        is_back_color = True
 
-                if is_black:
-                    colored_line += f"{CAT_COLORS['black']}{char}{RESET}"
+                if is_back_color:
+                    colored_line += f"{CAT_COLORS[color1]}{char}{RESET}"
                 else:
-                    colored_line += f"{CAT_COLORS['white']}{char}{RESET}"
+                    colored_line += f"{CAT_COLORS[color2]}{char}{RESET}"
 
             result.append(colored_line)
 
@@ -326,7 +333,7 @@ def for_iggy() -> None:
     """Print a black and white tuxedo cat matching Iggy's markings."""
     catto_path = Path(__file__).parent / "catto"
     content = catto_path.read_text(encoding="utf-8")
-    pattern_func = _iggy_pattern()
+    pattern_func = _iggy_pattern("black", "white")
     colored_content = pattern_func(content)
     print(colored_content)
     print("I miss the potamus.")
@@ -426,22 +433,202 @@ def for_moo() -> None:
     print("The moominkittycat would like food.  Please.")
 
 
+def _cassandra_pattern() -> PatternFunc:
+    """Create Cassandra's silver tabby pattern with darker stripes and white tail tip."""
+    def apply(content: str) -> str:
+        lines = content.split("\n")
+        total_lines = len(lines)
+        result = []
+
+        for i, line in enumerate(lines):
+            if not line.strip():
+                result.append(line)
+                continue
+
+            stripped = line.lstrip()
+            leading_spaces = len(line) - len(stripped)
+            content_len = len(stripped)
+            center = leading_spaces + content_len // 2
+
+            colored_line = ""
+            for j, char in enumerate(line):
+                if char in " \t":
+                    colored_line += char
+                    continue
+
+                dist_from_center = abs(j - center)
+                relative_line = i / total_lines
+
+                # Tabby stripe effect based on line position
+                is_stripe_line = i % 4 < 2
+
+                # Determine color based on position
+                if relative_line < 0.12:
+                    # Top of head/ears - dark gray with stripes
+                    if is_stripe_line:
+                        color = "dark_gray"
+                    else:
+                        color = "gray"
+                elif relative_line < 0.30:
+                    # Face area - silver base with gray stripes, some tan accents
+                    if dist_from_center > content_len * 0.35:
+                        # Outer edges - darker
+                        color = "dark_gray" if is_stripe_line else "gray"
+                    elif dist_from_center > content_len * 0.2:
+                        # Mid face - silver with stripes
+                        color = "gray" if is_stripe_line else "silver"
+                    else:
+                        # Center face - silver with light brown accent
+                        if is_stripe_line and i % 6 < 2:
+                            color = "fawn"
+                        else:
+                            color = "silver"
+                elif relative_line < 0.55:
+                    # Upper body - silver with tabby stripes
+                    if dist_from_center > content_len * 0.4:
+                        color = "dark_gray" if is_stripe_line else "gray"
+                    elif dist_from_center > content_len * 0.25:
+                        color = "gray" if is_stripe_line else "silver"
+                    else:
+                        # Chest area - lighter silver
+                        color = "light_gray" if is_stripe_line else "silver"
+                elif relative_line < 0.75:
+                    # Mid body/belly - silver with stripes and tan patches
+                    if dist_from_center > content_len * 0.35:
+                        color = "dark_gray" if is_stripe_line else "gray"
+                    elif dist_from_center > content_len * 0.2:
+                        # Add subtle tan patches
+                        if i % 7 < 2:
+                            color = "fawn"
+                        elif is_stripe_line:
+                            color = "gray"
+                        else:
+                            color = "silver"
+                    else:
+                        color = "silver"
+                elif relative_line < 0.90:
+                    # Lower body/legs - gray tabby pattern
+                    if is_stripe_line:
+                        color = "dark_gray"
+                    else:
+                        color = "silver"
+                else:
+                    # Tail/feet area - white-tipped tail
+                    if dist_from_center < content_len * 0.15:
+                        # Tail tip - white
+                        color = "white"
+                    elif is_stripe_line:
+                        color = "gray"
+                    else:
+                        color = "silver"
+
+                colored_line += f"{CAT_COLORS[color]}{char}{RESET}"
+
+            result.append(colored_line)
+
+        return "\n".join(result)
+    return apply
+
+
 def for_cassandra() -> None:
-    """Print a silver cat for Cassandra."""
+    """Print a silver tabby cat for Cassandra."""
     catto_path = Path(__file__).parent / "catto"
     content = catto_path.read_text(encoding="utf-8")
-    pattern_func = _solid_pattern("silver")
+    pattern_func = _cassandra_pattern()
     colored_content = pattern_func(content)
     print(colored_content)
+    print("The babiest brioche loaf you ever saw.")
+
+
+def _persephone_pattern() -> PatternFunc:
+    """Create Persephone's silver and white bicolor pattern."""
+    def apply(content: str) -> str:
+        lines = content.split("\n")
+        total_lines = len(lines)
+        result = []
+
+        for i, line in enumerate(lines):
+            if not line.strip():
+                result.append(line)
+                continue
+
+            stripped = line.lstrip()
+            leading_spaces = len(line) - len(stripped)
+            content_len = len(stripped)
+            center = leading_spaces + content_len // 2
+
+            colored_line = ""
+            for j, char in enumerate(line):
+                if char in " \t":
+                    colored_line += char
+                    continue
+
+                dist_from_center = abs(j - center)
+                relative_line = i / total_lines
+
+                # Determine color based on position
+                # Gray/silver on back and sides, white on chest/belly/paws
+                if relative_line < 0.10:
+                    # Top of head/ears - darker gray
+                    if dist_from_center > content_len * 0.3:
+                        color = "dark_gray"
+                    else:
+                        color = "gray"
+                elif relative_line < 0.25:
+                    # Face area - gray on sides, lighter in center
+                    if dist_from_center > content_len * 0.35:
+                        color = "dark_gray"
+                    elif dist_from_center > content_len * 0.2:
+                        color = "gray"
+                    else:
+                        color = "silver"
+                elif relative_line < 0.45:
+                    # Upper chest - white center, gray sides
+                    if dist_from_center > content_len * 0.35:
+                        color = "gray"
+                    elif dist_from_center > content_len * 0.2:
+                        color = "silver"
+                    else:
+                        color = "white"
+                elif relative_line < 0.70:
+                    # Chest and belly - prominent white center
+                    if dist_from_center > content_len * 0.4:
+                        color = "gray"
+                    elif dist_from_center > content_len * 0.25:
+                        color = "light_gray"
+                    else:
+                        color = "white"
+                elif relative_line < 0.88:
+                    # Lower body - white belly, gray back
+                    if dist_from_center > content_len * 0.35:
+                        color = "gray"
+                    elif dist_from_center > content_len * 0.2:
+                        color = "silver"
+                    else:
+                        color = "white"
+                else:
+                    # Paws - white
+                    if dist_from_center > content_len * 0.4:
+                        color = "silver"
+                    else:
+                        color = "white"
+
+                colored_line += f"{CAT_COLORS[color]}{char}{RESET}"
+
+            result.append(colored_line)
+
+        return "\n".join(result)
+    return apply
 
 
 def for_persephone() -> None:
-    """Print a silver cat for Persephone."""
+    """Print a silver and white bicolor cat for Persephone."""
     catto_path = Path(__file__).parent / "catto"
     content = catto_path.read_text(encoding="utf-8")
-    pattern_func = _solid_pattern("silver")
+    pattern_func = _persephone_pattern()
     colored_content = pattern_func(content)
     print(colored_content)
+    print("Miss independent snugglemonster, Percypie herself.")
 
 
 CAT_NAMES = ["iggy", "magda", "lucy", "cassandra", "persephone"]

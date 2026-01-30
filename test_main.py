@@ -5,11 +5,16 @@ from main import (
     CAT_COLORS,
     RESET,
     _calico_pattern,
+    _cassandra_pattern,
     _colorpoint_pattern,
+    _iggy_pattern,
+    _persephone_pattern,
     _solid_pattern,
     _tabby_pattern,
     _tortoiseshell_pattern,
     _tuxedo_pattern,
+    for_cassandra,
+    for_persephone,
     get_random_pattern,
     print_catto,
 )
@@ -152,6 +157,26 @@ def test_tuxedo_pattern_uses_black_and_white() -> None:
     assert CAT_COLORS["white"] in result
 
 
+def test_iggy_pattern_uses_specified_colors() -> None:
+    """Verify iggy pattern applies the two specified colors."""
+    # Test with black and white (original Iggy colors)
+    pattern = _iggy_pattern("black", "white")
+    content = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMM\n" * 20
+    result = pattern(content)
+
+    assert CAT_COLORS["black"] in result
+    assert CAT_COLORS["white"] in result
+
+    # Test with different color combination
+    pattern2 = _iggy_pattern("orange", "white")
+    result2 = pattern2(content)
+
+    assert CAT_COLORS["orange"] in result2
+    assert CAT_COLORS["white"] in result2
+    # Should not contain black since we specified orange
+    assert CAT_COLORS["black"] not in result2
+
+
 def test_colorpoint_pattern_has_body_and_points() -> None:
     """Verify colorpoint pattern has different colors for body and extremities."""
     pattern = _colorpoint_pattern("cream", "chocolate")
@@ -172,6 +197,48 @@ def test_cat_colors_are_valid_ansi_codes() -> None:
         assert match is not None, f"{name} has invalid ANSI code"
         color_num = int(match.group(1))
         assert 0 <= color_num <= 255, f"{name} color {color_num} out of range"
+
+
+def test_cassandra_pattern_uses_silver_tabby_colors() -> None:
+    """Verify Cassandra's pattern uses silver, gray, dark gray, fawn, and white."""
+    pattern = _cassandra_pattern()
+    # Need enough lines to cover all regions including tail
+    content = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMM\n" * 40
+    result = pattern(content)
+
+    assert CAT_COLORS["silver"] in result
+    assert CAT_COLORS["gray"] in result
+    assert CAT_COLORS["dark_gray"] in result
+    assert CAT_COLORS["white"] in result  # White tail tip
+    assert CAT_COLORS["fawn"] in result  # Tan/brown accent patches
+
+
+def test_persephone_pattern_uses_silver_white_bicolor() -> None:
+    """Verify Persephone's pattern uses white, silver, gray, and dark gray."""
+    pattern = _persephone_pattern()
+    # Need enough lines to cover all regions including paws
+    content = "MMMMMMMMMMMMMMMMMMMMMMMMMMMMM\n" * 40
+    result = pattern(content)
+
+    assert CAT_COLORS["white"] in result  # White chest/belly/paws
+    assert CAT_COLORS["silver"] in result  # Silver transitions
+    assert CAT_COLORS["gray"] in result  # Gray back/sides
+    assert CAT_COLORS["dark_gray"] in result  # Dark gray on head
+    assert CAT_COLORS["light_gray"] in result  # Light gray transitions
+
+
+def test_for_cassandra_prints_message(capsys: object) -> None:
+    """Verify for_cassandra prints the custom message."""
+    for_cassandra()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+    assert "The babiest brioche loaf you ever saw." in captured.out
+
+
+def test_for_persephone_prints_message(capsys: object) -> None:
+    """Verify for_persephone prints the custom message."""
+    for_persephone()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+    assert "Miss independent snugglemonster, Percypie herself." in captured.out
 
 
 def test_all_pattern_names_are_descriptive() -> None:
