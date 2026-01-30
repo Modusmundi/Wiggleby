@@ -32,6 +32,8 @@ CAT_COLORS = {
     "dark_gray": _color(239),
     "golden": _color(178),
     "auburn": _color(124),
+    "forest_green": _color(34),
+    "pink_red": _color(204),
 }
 
 # Pattern type alias
@@ -632,7 +634,57 @@ def for_persephone() -> None:
     print("Miss independent snugglemonster, Percypie herself.")
 
 
-CAT_NAMES = ["iggy", "magda", "lucy", "cassandra", "persephone"]
+def _jennycatto_pattern() -> PatternFunc:
+    """Create Jenny's pattern - forest green cat, pink/red heart."""
+    # The blank braille character used for spacing
+    blank_braille = "⠀"
+
+    # Define where the heart starts on each line (0-indexed line: column)
+    # These boundaries were determined by analyzing the hearto file structure
+    heart_boundaries: dict[int, int] = {
+        4: 28,  # File line 5: heart starts at column 29
+        5: 28,  # File line 6: heart starts at column 28
+        6: 28,  # File line 7: heart starts at column 28
+        7: 30,  # File line 8: heart starts at column 31
+        8: 32,  # File line 9: heart starts at column 32 (column 31 is whisker)
+    }
+
+    def apply(content: str) -> str:
+        lines = content.split("\n")
+        result = []
+
+        for i, line in enumerate(lines):
+            colored_line = ""
+            for j, char in enumerate(line):
+                # Skip blank braille characters (spacing)
+                if char == blank_braille:
+                    colored_line += char
+                    continue
+
+                # Check if this position is in the heart region
+                is_heart = i in heart_boundaries and j >= heart_boundaries[i]
+
+                if is_heart:
+                    colored_line += f"{CAT_COLORS['pink_red']}{char}{RESET}"
+                else:
+                    colored_line += f"{CAT_COLORS['forest_green']}{char}{RESET}"
+
+            result.append(colored_line)
+
+        return "\n".join(result)
+    return apply
+
+
+def for_jennycatto() -> None:
+    """Print the hearto ASCII art for Jenny."""
+    hearto_path = Path(__file__).parent / "hearto"
+    content = hearto_path.read_text(encoding="utf-8")
+    pattern_func = _jennycatto_pattern()
+    colored_content = pattern_func(content)
+    print(colored_content)
+
+
+CAT_NAMES = ["iggy", "magda", "lucy", "cassandra", "persephone", "jennycatto"]
 
 
 class CatArgumentParser(argparse.ArgumentParser):
@@ -644,7 +696,7 @@ class CatArgumentParser(argparse.ArgumentParser):
             self.exit(
                 2,
                 "You cannot call multiple cats!  "
-                "You must pick between iggy, magda, lucy, cassandra, or persephone.\n",
+                "You must pick between iggy, magda, lucy, cassandra, persephone, or jennycatto.\n",
             )
         if "unrecognized arguments" in message:
             self.print_help(sys.stderr)
@@ -682,6 +734,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Display a silver and white bicolor cat for Persephone",
     )
+    cat_group.add_argument(
+        "--jennycatto",
+        action="store_true",
+        help="Display a cat for Jenny (coming soon)",
+    )
 
     return parser.parse_args()
 
@@ -698,6 +755,8 @@ def main() -> None:
         for_cassandra()
     elif args.persephone:
         for_persephone()
+    elif args.jennycatto:
+        for_jennycatto()
     else:
         print_catto()
 

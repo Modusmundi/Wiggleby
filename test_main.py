@@ -8,12 +8,14 @@ from main import (
     _cassandra_pattern,
     _colorpoint_pattern,
     _iggy_pattern,
+    _jennycatto_pattern,
     _persephone_pattern,
     _solid_pattern,
     _tabby_pattern,
     _tortoiseshell_pattern,
     _tuxedo_pattern,
     for_cassandra,
+    for_jennycatto,
     for_persephone,
     get_random_pattern,
     print_catto,
@@ -239,6 +241,62 @@ def test_for_persephone_prints_message(capsys: object) -> None:
     for_persephone()
     captured = capsys.readouterr()  # type: ignore[attr-defined]
     assert "Miss independent snugglemonster, Percypie herself." in captured.out
+
+
+def test_for_jennycatto_outputs_hearto_content(capsys: object) -> None:
+    """Verify for_jennycatto outputs the hearto file content."""
+    for_jennycatto()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+
+    hearto_path = Path(__file__).parent / "hearto"
+    expected_content = hearto_path.read_text(encoding="utf-8")
+
+    # Strip ANSI codes and compare content
+    stripped_output = _strip_ansi(captured.out)
+    assert stripped_output.strip() == expected_content.strip()
+
+
+def test_jennycatto_pattern_uses_forest_green_and_pink_red() -> None:
+    """Verify jennycatto pattern uses forest_green for cat and pink_red for heart."""
+    hearto_path = Path(__file__).parent / "hearto"
+    content = hearto_path.read_text(encoding="utf-8")
+
+    pattern = _jennycatto_pattern()
+    result = pattern(content)
+
+    # Both colors should be present
+    assert CAT_COLORS["forest_green"] in result  # Cat color
+    assert CAT_COLORS["pink_red"] in result  # Heart color
+
+
+def test_jennycatto_pattern_colors_cat_green() -> None:
+    """Verify the cat portion (left side) is colored forest green."""
+    hearto_path = Path(__file__).parent / "hearto"
+    content = hearto_path.read_text(encoding="utf-8")
+
+    pattern = _jennycatto_pattern()
+    result = pattern(content)
+    lines = result.split("\n")
+
+    # Check a line that only has cat content (no heart) - line 0
+    # Should have forest_green but no pink_red
+    assert CAT_COLORS["forest_green"] in lines[0]
+    assert CAT_COLORS["pink_red"] not in lines[0]
+
+
+def test_jennycatto_pattern_colors_heart_pink() -> None:
+    """Verify the heart portion (right side, lines 4-8) is colored pink/red."""
+    hearto_path = Path(__file__).parent / "hearto"
+    content = hearto_path.read_text(encoding="utf-8")
+
+    pattern = _jennycatto_pattern()
+    result = pattern(content)
+    lines = result.split("\n")
+
+    # Check lines that have heart content (lines 4-8, 0-indexed)
+    # These lines should have pink_red color
+    for i in range(4, 9):
+        assert CAT_COLORS["pink_red"] in lines[i], f"Line {i} should have pink_red heart color"
 
 
 def test_all_pattern_names_are_descriptive() -> None:
