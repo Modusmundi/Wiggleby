@@ -682,7 +682,9 @@ def for_jennycatto() -> None:
     pattern_func = _jennycatto_pattern()
     colored_content = pattern_func(content)
     print(colored_content)
-
+    print("For my love.")
+    print("The heart of the catto family.")
+    print("I hope we have a fantastic Valentines Day, and a fantastic 100 more Valentines days together.")
 
 CAT_NAMES = ["iggy", "magda", "lucy", "cassandra", "persephone", "jennycatto"]
 
@@ -696,7 +698,7 @@ class CatArgumentParser(argparse.ArgumentParser):
             self.exit(
                 2,
                 "You cannot call multiple cats!  "
-                "You must pick between iggy, magda, lucy, cassandra, persephone, or jennycatto.\n",
+                "You must pick one cat flag only.\n",
             )
         if "unrecognized arguments" in message:
             self.print_help(sys.stderr)
@@ -710,34 +712,34 @@ def parse_args() -> argparse.Namespace:
 
     cat_group = parser.add_mutually_exclusive_group()
     cat_group.add_argument(
-        "--iggy",
+        "--iggy", "--ignatius",
         action="store_true",
         help="Display a black and white bicolor cat for Iggy",
     )
     cat_group.add_argument(
-        "--lucy",
+        "--lucy", "--lucrezia",
         action="store_true",
         help="Display a brown tabby cat for Lucy",
     )
     cat_group.add_argument(
-        "--magda",
+        "--magda", "--moo",
         action="store_true",
         help="Display a black cat for Magda the moominkittycat",
     )
     cat_group.add_argument(
-        "--cassandra",
+        "--cassandra", "--cassie",
         action="store_true",
         help="Display a silver tabby cat for Cassandra",
     )
     cat_group.add_argument(
-        "--persephone",
+        "--persephone", "--percy",
         action="store_true",
         help="Display a silver and white bicolor cat for Persephone",
     )
     cat_group.add_argument(
         "--jennycatto",
         action="store_true",
-        help="Display a cat for Jenny (coming soon)",
+        help="Display a message for my love.",
     )
 
     return parser.parse_args()

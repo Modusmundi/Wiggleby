@@ -1,6 +1,8 @@
 import re
 from pathlib import Path
 
+import sys
+
 from main import (
     CAT_COLORS,
     RESET,
@@ -15,9 +17,13 @@ from main import (
     _tortoiseshell_pattern,
     _tuxedo_pattern,
     for_cassandra,
+    for_iggy,
     for_jennycatto,
+    for_lucy,
+    for_moo,
     for_persephone,
     get_random_pattern,
+    parse_args,
     print_catto,
 )
 
@@ -244,16 +250,24 @@ def test_for_persephone_prints_message(capsys: object) -> None:
 
 
 def test_for_jennycatto_outputs_hearto_content(capsys: object) -> None:
-    """Verify for_jennycatto outputs the hearto file content."""
+    """Verify for_jennycatto outputs the hearto file content and messages."""
     for_jennycatto()
     captured = capsys.readouterr()  # type: ignore[attr-defined]
 
     hearto_path = Path(__file__).parent / "hearto"
     expected_content = hearto_path.read_text(encoding="utf-8")
 
-    # Strip ANSI codes and compare content
+    # Strip ANSI codes and verify hearto content is present
     stripped_output = _strip_ansi(captured.out)
-    assert stripped_output.strip() == expected_content.strip()
+    # Check that the hearto content is in the output (first lines)
+    hearto_lines = expected_content.strip().split("\n")
+    output_lines = stripped_output.strip().split("\n")
+    for i, line in enumerate(hearto_lines):
+        assert line == output_lines[i], f"Line {i} of hearto content doesn't match"
+
+    # Also verify the custom messages are present
+    assert "For my love." in captured.out
+    assert "The heart of the catto family." in captured.out
 
 
 def test_jennycatto_pattern_uses_forest_green_and_pink_red() -> None:
@@ -297,6 +311,56 @@ def test_jennycatto_pattern_colors_heart_pink() -> None:
     # These lines should have pink_red color
     for i in range(4, 9):
         assert CAT_COLORS["pink_red"] in lines[i], f"Line {i} should have pink_red heart color"
+
+
+def test_alternate_flag_ignatius(monkeypatch: object, capsys: object) -> None:
+    """Verify --ignatius flag works as alternate for --iggy."""
+    monkeypatch.setattr(sys, "argv", ["main.py", "--ignatius"])  # type: ignore[attr-defined]
+    args = parse_args()
+    assert args.iggy is True
+    for_iggy()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+    assert "I miss the potamus." in captured.out
+
+
+def test_alternate_flag_lucrezia(monkeypatch: object, capsys: object) -> None:
+    """Verify --lucrezia flag works as alternate for --lucy."""
+    monkeypatch.setattr(sys, "argv", ["main.py", "--lucrezia"])  # type: ignore[attr-defined]
+    args = parse_args()
+    assert args.lucy is True
+    for_lucy()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+    assert "The world's babiest." in captured.out
+
+
+def test_alternate_flag_moo(monkeypatch: object, capsys: object) -> None:
+    """Verify --moo flag works as alternate for --magda."""
+    monkeypatch.setattr(sys, "argv", ["main.py", "--moo"])  # type: ignore[attr-defined]
+    args = parse_args()
+    assert args.magda is True
+    for_moo()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+    assert "The moominkittycat would like food." in captured.out
+
+
+def test_alternate_flag_cassie(monkeypatch: object, capsys: object) -> None:
+    """Verify --cassie flag works as alternate for --cassandra."""
+    monkeypatch.setattr(sys, "argv", ["main.py", "--cassie"])  # type: ignore[attr-defined]
+    args = parse_args()
+    assert args.cassandra is True
+    for_cassandra()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+    assert "The babiest brioche loaf you ever saw." in captured.out
+
+
+def test_alternate_flag_percy(monkeypatch: object, capsys: object) -> None:
+    """Verify --percy flag works as alternate for --persephone."""
+    monkeypatch.setattr(sys, "argv", ["main.py", "--percy"])  # type: ignore[attr-defined]
+    args = parse_args()
+    assert args.persephone is True
+    for_persephone()
+    captured = capsys.readouterr()  # type: ignore[attr-defined]
+    assert "Miss independent snugglemonster, Percypie herself." in captured.out
 
 
 def test_all_pattern_names_are_descriptive() -> None:
