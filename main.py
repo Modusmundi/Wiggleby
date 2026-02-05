@@ -689,6 +689,13 @@ def for_jennycatto() -> None:
 CAT_NAMES = ["iggy", "magda", "lucy", "cassandra", "persephone", "jennycatto"]
 
 
+class CatHelpFormatter(argparse.HelpFormatter):
+    """Custom help formatter with wider option column."""
+
+    def __init__(self, prog: str) -> None:
+        super().__init__(prog, max_help_position=30)
+
+
 class CatArgumentParser(argparse.ArgumentParser):
     """Custom argument parser with cat-specific error messages."""
 
@@ -708,7 +715,10 @@ class CatArgumentParser(argparse.ArgumentParser):
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
-    parser = CatArgumentParser(description="Display a colorful ASCII cat.")
+    parser = CatArgumentParser(
+        description="Display a colorful ASCII cat.",
+        formatter_class=CatHelpFormatter,
+    )
 
     cat_group = parser.add_mutually_exclusive_group()
     cat_group.add_argument(
